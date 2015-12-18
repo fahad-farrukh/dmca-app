@@ -1,0 +1,307 @@
+Laravel 5 - Fundamentals
+
+http://slides.com/gr8rizwan/
+
+Install Composer
+	sudo curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+
+Create Laravel Project
+	sudo composer create-project laravel/laravel /opt/lampp/htdocs/laravel
+
+	REMOVE EXISTING VCS: YES
+
+Give write permissions to "htdocs/laravel" project folder
+	sudo chmod 0777 -R laravel/
+
+Run the server through "artisan" (available only within laravel project folder)
+	php artisan serve
+	// Laravel development server started on http://localhost:8000/
+
+Project can also be accessed through direct URL
+	e.g http://localhost/laravel/public/
+
+Add/update route in "laravel/app/Http/routes.php"
+
+Create controller and view function "laravel/app/Http/Controllers"
+	php artisan make:controller PagesController
+	php artisan make:controller PagesController --plain
+	php artisan help make:controller
+
+Create HTML view within "laravel/resources/views"
+
+Update DB credentials within "/opt/lampp/htdocs/laravel/.env"
+	Can select DB adopters mentioned in "/opt/lampp/htdocs/laravel/config/database.php"
+	"laravel/.env" are set to be ignored by GIT "/opt/lampp/htdocs/laravel/.gitignore"
+
+All the configuration files reside in "/opt/lampp/htdocs/laravel/config/" folder.
+
+Create DB migrations within "/opt/lampp/htdocs/laravel/database/migrations/"
+	php artisan make:migration create_articles_table --create="articles"	
+
+Run DB migrations
+	php artisan migrate
+	php artisan migrate:rollback
+
+Edit table columns/structure
+	php artisan make:migration add-excerpt_to_articles_table
+	php artisan make:migration add-excerpt_to_articles_table --table="articles"
+
+Create "Article" model (Eloquent Active Record)
+	php artisan make:model Article
+
+Using artisan tinker
+	php artisan tinker
+
+	>>> $name;
+	>>> $article = new App\Article;
+	>>> $article->title = 'My First Article';
+	>>> $article->body = 'Lorem ipsum';
+	>>> $article->published_at = Carbon\Carbon::now();
+	>>> $article->toArray();
+	>>> $article->save();
+	>>> App\Article::all()->toArray();
+	>>> $article = App\Article::find(1);
+	>>> $article = App\Article::where('body', 'Lorem ipsum')->get();
+	>>> $article = App\Article::where('body', 'Lorem ipsum')->first();
+	>>> exit
+	
+	php artisan tinker
+	>>> $article = App\Article::create(['title'=>'New Article', 'body'=>'New body', 'published_at'=>Carbon\Carbon::now()]); // No need to call "$article->save();"
+	>>> $article->update(['body'=>'Updated AGAIN']);
+
+	php artisan tinker
+	>>> $user = new App\User;
+	>>> $user->username = 'John Doe';
+	>>> $user->email = 'john@example.com';
+	>>> $user->password = Hash::make('password'); // Alternative syntax for Hash
+	>>> $user->password = bcrypt('password');
+	>>> $user->save();
+	>>> $user->toArray();
+	>>> $user->articles->toArray();
+	>>> $user->articles();// Returns hasMany object, that allows further chaining
+	>>> $user->articles()->get();// Returns collection
+	>>> $user->articles()->get()->toArray(); // Returns data array
+	>>> $user->articles()->where('title', 'new Article')->get();// Returns collection
+	>>> $user->articles()->where('title', 'new Article')->get()->toArray();// Returns data array
+	>>> $article = App\Article::first();
+	>>> $article->user->toArray();
+	>>> $user = App\User::where('username', 'John Doe')->first();// Process to get articles for "John Doe"
+	>>> $user->toArray();
+	>>> $articles =  $user->articles;
+	>>> $articles->toArray();
+	>>> $tag = new App\Tag;
+	>>> $tag->name = 'personal';
+	>>> $tag->save();
+	>>> App\Tag::all()->toArray();
+	>>> App\Tag::lists('name'); // Lists all the values for a given column
+	>>> $article = App\Article::first();
+	>>> $article->toArray();
+	>>> $article->tags()->attach(1); // "attach(1)" takes "tag_id" to create association between articles and tags records by inserting in "article_tag" table
+	>>> DB::select('select * from article_tag');
+	>>> $article = App\Article::first();
+	>>> $article->tags->toArray();
+	>>> $article->toArray();
+	>>> $article->tags->lists('name');
+	>>> $tag = App\Tag::first();
+	>>> $tag->toArray();
+	>>> $tag->articles->toArray();
+
+
+
+
+MVC Workflow
+	Create Route ("laravel/app/Http/routes.php")
+		Route::get('articles','ArticlesController@index');
+	Make Controller
+		php artisan make:controller ArticlesController --plain
+	Impliment method in controller
+	Create view for controller method ("laravel/resources/views/*controller_name*")
+
+Forms
+	Add "illuminate/html" package for forms
+		composer require illuminate/html
+	Add providers and aliases for "illuminate/html" (/opt/lampp/htdocs/laravel/config/app.php)
+
+Laravel Form Requests
+	php artisan make:request CreateArticleRequest
+
+List defined routes
+	php artisan route:list
+
+Missing auth views
+	https://github.com/laravel/laravel/commit/5e11f87de2c8f9303e6e296d74ec5f7f2093fd9b
+
+Path to AuthenticatesAndRegistersUsers.php
+	laravel/vendor/laravel/framework/src/Illuminate/Foundation/Auth/AuthenticatesAndRegistersUsers.php
+	The files arrangement is a bit changed then whats shown in videos.
+
+Managing your Assets
+	Check if node.js is installed (required by gulp)
+		node -v
+		npm -v
+	Installing node.js and  node package manager (npm)
+		sudo apt-get install nodejs
+		sudo apt-get install npm
+	Create a symbolic link for node, as many Node.js tools use this name to execute.
+		//sudo ln -s /usr/bin/nodejs /usr/bin/node
+	Install npm dependencies for node
+		cd htdocs/laravel
+		sudo npm install
+		npm root
+		npm config set prefix /usr/local
+		npm root -g
+		sudo npm install -g gulp
+	Run GULP
+		gulp
+	Keep runing GULP in background (for css and js I belive but not for phpUnit tests)
+		gulp watch
+	Incase there is issue compiling coffee script
+		You did not specifiy the name of the coffee script, so Elixir doesn't know what file it needs to compile. The only thing you need to do is specify 			the name of the script between the curly brackets like so:
+
+		elixir(function(mix) {
+		  mix.coffee('test.coffee');
+		});
+		There is also something called method chaining. This will allow you to run multiple tasks at once. If you add your Sass, your code should look 			something like this:
+
+		elixir(function(mix) {
+		  mix.sass('app.scss')
+		     .coffee('test.coffee');
+		});
+	Compress/minify css/js while generation
+		gulp --production
+	Keep runing GULP in background (for phpUnit tests)
+		gulp tdd
+
+
+
+Pull-in package for "Flash messages"
+	composer require laracasts/flash
+
+Three steps of pulling-in a package
+	1- composer require "PACKAGE NAME"
+	2- include service provider in config/app.php
+	3- include aliases in config/app.php
+
+
+Rules for naming composite table, 
+        => convert individual table names in singular form e.g. articles => article and tags => tag OR users => user and roles => role
+        =>combine singular table names in alphabetical order sperated by underscore e.g. "article_tag" OR "role_user"
+
+	if there already exists a composite table that doesn't meet nameing convention mentioned above
+	you can specify that as second parameter to "belongsToMany()", 
+	similarly if they have different ids they can also be specified as third and fourth parameters e.g.
+	belongsToMany('App\Article','table_name','table_id', 'name_id');
+
+
+Issue with displaying selected multi-select
+	Article =>"return $this->tags->lists('id');" to "return $this->tags->lists('id')->toArray();"
+
+Navigation HTML browed from here
+	view-source:http://getbootstrap.com/examples/starter-template/
+	// Used View Composer to set data required by navigation View partial on different pages
+
+
+Repositories
+	Like collection stores that can be used to take complex queries and 
+	isolate them into methods with readable names  
+
+
+
+
+
+
+
+Issues
+	If a variable is used in the view but not passed from controller, it generates error, need to look into that.
+	Unable to access "auth/register" page, after login, results in error.
+
+
+
+
+
+Laravel 5 - Building Your First App
+
+Installed Laravel Installer
+	sudo composer global require "laravel/installer"
+
+Set Laravel Installer path to $PATH
+	/*** only active for your current terminal session ***/
+	export PATH="$PATH:~/.composer/vendor/bin"
+	/*** for checking if added to PATH ***/
+	echo $PATH
+
+Create Laravel Project
+	laravel new dmca-app
+
+Give write permissions to "htdocs/dmca-app" project folder
+	sudo chmod 0777 -R dmca-app/
+
+Workaround for missing app.blade.php
+	http://stackoverflow.com/questions/30980906/laravel-5-1-app-and-home-blade-php-missing
+
+	You didn't do anything wrong. The Auth Scaffolding was removed from Laravel 5.1. That includes the app.blade.php and the home.blade.php that you mentioned.
+
+	However, you'll still be able to get it back with the Scafold Package :
+
+	1.Add Scafold to your composer.json file in the require : section :
+
+	require : {
+		"laravel/framework": "5.1.*",
+		"bestmomo/scafold": "dev-master"
+	}
+	or type from terminal :
+
+	composer require bestmomo/scafold dev-master
+	2.Update composer :
+
+	composer update
+	3.Add the service provider to your config/app.php :
+
+	Bestmomo\Scafold\ScafoldServiceProvider::class,
+	4.Publish the views and assets :
+
+	php artisan vendor:publish
+	Done!
+
+
+To show file .env.example
+	.env.example is hidden, select "Show Hidden Files" (Ctrl+H) to view it
+
+Make sure to delete laravel's compiled file that groups things togather for performance purposes
+	php artisan clear-compiled
+
+Fetch "illuminate/html" component for Form
+	composer require illuminate/html
+
+Install any gulp and elixir dependencies mentioned in "dmca-app/package.json"
+	sudo npm install
+
+Made Form Request to validate the form.
+	php artisan make:request PrepareNoticeRequest
+
+Make migration for providers
+	php artisan make:migration create_providers_table --create=providers
+	php artisan migrate
+
+Make model for providers
+	php artisan make:model Provider
+
+Make model for Notice
+	php artisan make:model Notice
+
+Make migration for Notice
+	php artisan make:migration create_notices_table --create=notices
+	php artisan migrate
+
+Issues related to errors not displaying, enable php's "display_errors"
+	//ini_set('display_errors', '1');
+
+Issues related to permissions being overridden (e.g on running "gulp"), reassign permissions
+	sudo chmod 0777 -R dmca-app/
+
+Installing Guzzle HTTP library for Mandrill Driver (Mail API)
+	sudo composer require guzzlehttp/guzzle:~5.3|~6.0
+
+Installing "flash" package for session notifications
+	sudo composer require laracasts/flash
+

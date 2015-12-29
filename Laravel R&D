@@ -305,3 +305,22 @@ Installing Guzzle HTTP library for Mandrill Driver (Mail API)
 Installing "flash" package for session notifications
 	sudo composer require laracasts/flash
 
+
+
+
+Laravel 5 - Intermediate Laravel
+
+08 Middleware Parameters
+	php artisan migrate
+	php artisan make:middleware MustBeSubscribed
+
+09 Database Seeding and Model Factories
+	php artisan db:seed	
+
+	ISSUE RELATED TO "[ReflectionException]  Class UsersTableSeeder does not exist"
+		composer dump-autoload
+
+11 Dispatching Jobs
+	php artisan make:job CompileReports
+	
+	"dispatchFrom" method has been removed from "htdocs/intermediate-laravel/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php"
